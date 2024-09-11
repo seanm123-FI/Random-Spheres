@@ -9,8 +9,8 @@
         var createSphere = document.createElement("div");  //creates new div element in HTML
         createSphere.className = "sphere";                //assigning the defined sphere CSS element to 'createSphere'
 
-        var x = Math.floor(Math.random() * (window.innerWidth - 100));       //gives random xpos by getting number between 0 and 1 ie. 0.2324 and multiplying by screenwidth ie. 1000 = 232.4 and flooring it to give sphere xpos of 232
-        var y = Math.floor(Math.random() * (window.innerHeight - 100));       //gives random ypos by getting number between 0 and 1 ie. 0.5712 and multiplying by screenwidth ie. 1000 = 571.2 and flooring it to give sphere xpos of 571
+        var x = Math.floor(Math.random() * (window.innerWidth - 100));       //gives random xpos by getting number between 0 and 1 ie. 0.2324 and multiplying by screen width ie. 1000 = 232.4 and flooring it to give sphere xpos of 232
+        var y = Math.floor(Math.random() * (window.innerHeight - 100));       //gives random ypos by getting number between 0 and 1 ie. 0.5712 and multiplying by screen height ie. 1000 = 571.2 and flooring it to give sphere xpos of 571
         createSphere.style.left = x + "px";                             //starts at left side of screen and places sphere onto screen at xpos by whatever the x amount was calculated at
         createSphere.style.bottom = y + "px";                           //starts at bottom of screen and places sphere onto screen at ypos by whatever the y amount was calculated at
 
