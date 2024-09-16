@@ -1,8 +1,8 @@
 .sphere{
-    display: block;            /* gives separate line in doc flow */
-    position: absolute;      /* positoned absolutely by the declaration for left and bottom in js */
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;  /* gives spherical shape, square with no border radius */
+  display: block;            /* gives separate line in doc flow */
+  position: absolute;      /* positoned absolutely by the declaration for left and bottom in js */
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;  /* gives spherical shape, square with no border radius */
 }
 

@@ -16,8 +16,10 @@
 
         var sphereColour = colours[Math.floor(Math.random() * colours.length)];      //gets number between 0 and 1 ie. 0.3489 * 8 = 2.7912, floored to 2 so blue is selected and assigned to sphereColour
         createSphere.style.background = `radial-gradient(circle at 50% 50%, ${sphereColour}, black)`; //assigning radial gradient background style to sphere to give more spherical perception, sphere colour is the random selection in prev line and black is the second colour of the gradient
-
+        createSphere.style.boxShadow = ` 0 0 3px 1.5px ${sphereColour}`;       
+   
         body.appendChild(createSphere);  //adds sphere to HTML doc as a child of the body element which makes it visible on page
     }
  });
 
+            
