@@ -66,7 +66,7 @@ function moveBall(sphere, speeds, allSpheres) {
   let posX = parseInt(sphere.style.left) || 0;  // get the current x pos of the sphere
   let posY = parseInt(sphere.style.top) || 0;  // get the current y pos of the sphere
   const sphereWidth = sphere.clientWidth || 0;  // get the width of the sphere
-  const sphereHeight = sphere.clientHeight || 0;  // get the height of the sphere
+  const sphereHeight = sphere.clientHeight || 0;  // get the height of the sphere    
 
   function move() {
     // Check if the sphere has reached the left or right edge of the window.
