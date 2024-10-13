@@ -4,7 +4,8 @@ let allSpheres = [];
 // Function to create spheres
 function createSpheres(body, numOfSpheres, colours) {
   for (let i = 0; i < numOfSpheres; i++) {
-    const createSphere = document.createElement("div");  // creates new div element in HTML
+    let attempts = 0;           
+    createSphere = document.createElement("div");  // creates new div element in HTML
     createSphere.className = "sphere";  // assigning the defined sphere CSS element to 'createSphere'
 
     const x = Math.floor(Math.random() * (window.innerWidth - 100));  // gives random xpos
@@ -12,15 +13,41 @@ function createSpheres(body, numOfSpheres, colours) {
     createSphere.style.left = x + "px";  // starts at left side of screen
     createSphere.style.top = y + "px";  // starts at top of screen
 
+    document.body.appendChild(createSphere);
+    isOverlapping = checkOverlapOnCreation(createSphere, allSpheres);
+    
+
+  if (isOverlapping) {
+    attempts++;
+    console.log(`Attempt ${attempts}: Overlap detected, repositioning sphere.`);
+    document.body.removeChild(createSphere); // Remove from DOM if overlapping
+    }
+  else
+    {
     const sphereColour = colours[Math.floor(Math.random() * colours.length)];  // gets random sphere colour
     createSphere.style.background = `radial-gradient(circle at 50% 50%, ${sphereColour}, black)`;  // assigning radial gradient
     createSphere.style.boxShadow = `0 0 3px 1.5px ${sphereColour}`;  // adding shadow for 3D effect
 
-    body.appendChild(createSphere);  // adds sphere to HTML doc as a child of the body element
+    body.appendChild(createSphere);  // adds sphere to HTML doc as a child of the body element  
+   // createSpheres(body, numOfSpheres, colours);  
+    const speeds = { speedX: 5, speedY: 5 };  
+    allSpheres.push({ sphere: createSphere, speeds });
     addSphereDrag(createSphere);  // adds dragging functionality to the sphere
-    addSphereDoubleClick(createSphere, allSpheres);  // adds double-click functionality for movement and collision
+    addSphereDoubleClick(createSphere, speeds);  // adds double-click functionality for movement and collision
+    //I had too many arguments in double click func
+    }
   }
 }
+
+
+ function checkOverlapOnCreation(newSphere, existingSpheres){
+        for (let existingSphereObj of existingSpheres) {
+          if(collide(newSphere, existingSphereObj.sphere)){
+            return true;
+          }
+        }
+        return false;
+ }
 
 // Function to add dragging events to the sphere
 function addSphereDrag(sphere) {
@@ -52,21 +79,21 @@ function addSphereDrag(sphere) {
   });
 }
 
-// Function to add double-click events for animation to the sphere
-function addSphereDoubleClick(sphere, allSpheres) {
+
+function addSphereDoubleClick(sphere, speeds) {
   sphere.addEventListener('dblclick', function() {
-    const speeds = { speedX: 3, speedY: 3 };
-    allSpheres.push({ sphere, speeds });
-    moveBall(sphere, speeds, allSpheres);  // call the moveBall function with arguments
+    moveBall(sphere, speeds);  // call the moveBall function with arguments
   });
 }
 
 // Function to move the ball
-function moveBall(sphere, speeds, allSpheres) {
+function moveBall(sphere, speeds) {
+  console.log('Starting moveBall'); 
   let posX = parseInt(sphere.style.left) || 0;  // get the current x pos of the sphere
   let posY = parseInt(sphere.style.top) || 0;  // get the current y pos of the sphere
   const sphereWidth = sphere.clientWidth || 0;  // get the width of the sphere
   const sphereHeight = sphere.clientHeight || 0;  // get the height of the sphere    
+
 
   function move() {
     // Check if the sphere has reached the left or right edge of the window.
@@ -77,12 +104,12 @@ function moveBall(sphere, speeds, allSpheres) {
     // Check if the sphere has reached the top or bottom edge of the window.
     if (posY <= 0 || posY >= window.innerHeight - sphereHeight) {
       speeds.speedY *= -1;  // reverse direction
-    }
+    } 
 
     posX += speeds.speedX;  // update x pos
     posY += speeds.speedY;  // update y pos
 
-    sphere.style.left = posX + 'px';  // set new x pos
+    sphere.style.left = posX + 'px';  // set new x pos   
     sphere.style.top = posY + 'px';  // set new y pos
 
     // Check for collisions with other spheres
@@ -90,49 +117,88 @@ function moveBall(sphere, speeds, allSpheres) {
       let otherSphere = otherSphereObj.sphere;
       let otherSpeeds = otherSphereObj.speeds;
       if (otherSphere !== sphere && collide(sphere, otherSphere)) {
+        console.log("COLLISION")
         handleCollision(sphere, otherSphere, speeds, otherSpeeds);  // call collision handler
+            
       }
     }
-
+    if(speeds.speedX != 0 || speeds.speedY != 0){ //no need to call new frame if sphere not moving
     requestAnimationFrame(move);  // request the next animation frame
   }
-
-  requestAnimationFrame(move);  // call the move function
+}
+  requestAnimationFrame(move);  // call the move function 
 }
 
 // Function to check collision between two spheres
 function collide(sphere1, sphere2) {
-  const x1 = parseInt(sphere1.style.left) + sphere1.clientWidth / 2;  // xpos of sphere1 + radius
-  const y1 = parseInt(sphere1.style.top) + sphere1.clientHeight / 2;  // ypos of sphere1 + radius
-  const x2 = parseInt(sphere2.style.left) + sphere2.clientWidth / 2;  // xpos of sphere2 + radius
-  const y2 = parseInt(sphere2.style.top) + sphere2.clientHeight / 2;  // ypos of sphere2 + radius
+  // Calculate the center coordinates of sphere1
+  const x1 = parseInt(sphere1.style.left) + (sphere1.clientWidth / 2);
+  const y1 = parseInt(sphere1.style.top) + (sphere1.clientHeight / 2);
+  
+  // Calculate the center coordinates of sphere2
+  const x2 = parseInt(sphere2.style.left) + (sphere2.clientWidth / 2);
+  const y2 = parseInt(sphere2.style.top) + (sphere2.clientHeight / 2);
 
-  const distanceX = x2 - x1;  // distance between two xpos
-  const distanceY = y2 - y1;  // distance between two ypos
-  const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);  // distance formula
-
-  const sphereRadii = (sphere1.clientWidth / 2) + (sphere2.clientWidth / 2);  // combined radii distance before touching each other
-  return totalDistance < sphereRadii;  // true if spheres collided
+  
+  // Compute distance between the centers
+  const distanceX = x2 - x1;
+  const distanceY = y2 - y1;
+  const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);  // Euclidean distance
+  
+  // Compute the sum of the radii
+  const combinedRadii = (sphere1.clientWidth / 2) + (sphere2.clientWidth / 2);
+  
+  // Return true if totalDistance is less than combinedRadii
+  return totalDistance < combinedRadii;
 }
+
 
 // Function to handle the collision response between two spheres
-function handleCollision(sphere1, sphere2, speed1, speed2) {
-  // Simple collision response
-  let tempSpeedX = speed1.speedX;  // store sphere1's current speedX temporarily
-  let tempSpeedY = speed1.speedY;  // store sphere1's current speedY temporarily
+function handleCollision(movingSphere, staticSphere, movingSpeeds){
 
-  speed1.speedX = speed2.speedX;  // assign sphere2's speedX to sphere1
-  speed1.speedY = speed2.speedY;  // assign sphere2's speedY to sphere1
+    // Calculate the center coordinates of movingSphere
+    const x1 = parseInt(movingSphere.style.left) + (movingSphere.clientWidth / 2);
+    const y1 = parseInt(movingSphere.style.top) + (movingSphere.clientHeight / 2);
+  
+    // Calculate the center coordinates of staticSphere
+    const x2 = parseInt(staticSphere.style.left) + (staticSphere.clientWidth / 2);
+    const y2 = parseInt(staticSphere.style.top) + (staticSphere.clientHeight / 2);
 
-  speed2.speedX = tempSpeedX;  // assign tempSpeedX to sphere2's speedX
-  speed2.speedY = tempSpeedY;  // assign tempSpeedY to sphere2's speedY
+      // Calculate distance
+    const distanceX = x2 - x1;
+    const distanceY = y2 - y1;
+    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+
+        // Calculate overlap
+    const overlap = ((movingSphere.clientWidth / 2) + (staticSphere.clientWidth / 2)) - distance;
+
+    // Normalize
+    const normX = distanceX / distance;
+    const normY = distanceY / distance;
+
+    // Move moving sphere apart from static sphere
+    const pushX = overlap * normX;
+    const pushY = overlap * normY;
+
+    movingSphere.style.left = `${parseInt(movingSphere.style.left) - pushX}px`;
+    movingSphere.style.top = `${parseInt(movingSphere.style.top) - pushY}px`;
+
+    // Reflect the velocity of the moving sphere
+    const dotProduct = movingSpeeds.speedX * normX + movingSpeeds.speedY * normY;
+    movingSpeeds.speedX -= 2 * dotProduct * normX;
+    movingSpeeds.speedY -= 2 * dotProduct * normY;
 }
 
+
 // Main body of the script
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {  //implement self executing function
   const body = document.querySelector("body");  // gets body element of HTML 
   const numOfSpheres = Math.floor(Math.random() * 10);  // Math random creates a decimal between 0 and 1, ie 0.4785. * 10 to give 4.785 and then flooring it to 4
   const colours = ['green', 'yellow', 'blue', 'pink', 'yellow', 'purple', 'red', 'orange'];  // array of potential sphere colours
 
   createSpheres(body, numOfSpheres, colours);  // call the function to create spheres
 });
+
+
+//es6        
