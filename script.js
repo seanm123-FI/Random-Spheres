@@ -19,22 +19,23 @@ function createSpheres(body, numOfSpheres, colours) {
 
   if (isOverlapping) {
     attempts++;
-    console.log(`Attempt ${attempts}: Overlap detected, repositioning sphere.`);
+    console.log('Overlap detected, repositioning sphere.');
     document.body.removeChild(createSphere); // Remove from DOM if overlapping
     }
   else
     {
-    const sphereColour = colours[Math.floor(Math.random() * colours.length)];  // gets random sphere colour
-    createSphere.style.background = `radial-gradient(circle at 50% 50%, ${sphereColour}, black)`;  // assigning radial gradient
-    createSphere.style.boxShadow = `0 0 3px 1.5px ${sphereColour}`;  // adding shadow for 3D effect
+      const randomIndex = Math.floor(Math.random() * colours.length);
+      const sphereColour = colours[randomIndex]; // gets random sphere colour
+      createSphere.style.background = `radial-gradient(circle at 50% 50%, ${sphereColour}, black)`; // assigning radial gradient
+      createSphere.style.boxShadow = `0 0 3px 1.5px ${sphereColour}`; // adding shadow for 3D effect
 
-    body.appendChild(createSphere);  // adds sphere to HTML doc as a child of the body element  
-   // createSpheres(body, numOfSpheres, colours);  
-    const speeds = { speedX: 5, speedY: 5 };  
-    allSpheres.push({ sphere: createSphere, speeds });
-    addSphereDrag(createSphere);  // adds dragging functionality to the sphere
-    addSphereDoubleClick(createSphere, speeds);  // adds double-click functionality for movement and collision
-    //I had too many arguments in double click func
+      body.appendChild(createSphere);  // adds sphere to HTML doc as a child of the body element  
+    // createSpheres(body, numOfSpheres, colours);  
+      const speeds = { speedX: 5, speedY: 5 };  
+      allSpheres.push({ sphere: createSphere, speeds });
+      addSphereDrag(createSphere);  // adds dragging functionality to the sphere
+      addSphereDoubleClick(createSphere, speeds);  // adds double-click functionality for movement and collision
+      //I had too many arguments in double click func
     }
   }
 }
@@ -190,15 +191,60 @@ function handleCollision(movingSphere, staticSphere, movingSpeeds){
     movingSpeeds.speedY -= 2 * dotProduct * normY;
 }
 
+async function getDateTime(){
+  const response = await
+  fetch('http://worldtimeapi.org/api/ip');
+    const data = await response.json();
+    return new Date(data.datetime);
+}
 
-// Main body of the script
-document.addEventListener("DOMContentLoaded", function() {  //implement self executing function
-  const body = document.querySelector("body");  // gets body element of HTML 
-  const numOfSpheres = Math.floor(Math.random() * 10);  // Math random creates a decimal between 0 and 1, ie 0.4785. * 10 to give 4.785 and then flooring it to 4
-  const colours = ['green', 'yellow', 'blue', 'pink', 'yellow', 'purple', 'red', 'orange'];  // array of potential sphere colours
+
+function getSunPosition(datetime){
+  const hours = datetime.getHours();
+  const minutes = datetime.getMinutes();
+  const totalMinutes = (hours * 60) + minutes;
+  const xpos = (window.innerWidth / 1440) * totalMinutes;
+
+  return{x: xpos, y: 100};
+}
+
+// Function to get a random number between min and max (inclusive)
+function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getRandomRGBColour(){
+  var red = getRandomNumber(0, 255);
+  var green = getRandomNumber(0, 255);
+  var blue = getRandomNumber(0, 255);
+  return 'rgb(' + red + ', ' + green + ', ' + blue + ')';
+}
+
+async function initialise() {
+  const body = document.querySelector("body");
+  const sun = document.createElement("div");
+  sun.className = "sun";
+  body.appendChild(sun);
+
+  const datetime = await getDateTime();
+  const sunPosition = getSunPosition(datetime);
+  sun.style.left = `${sunPosition.x}px`;
+  sun.style.top = `${sunPosition.y}px`;
+
+  const numOfSpheres = Math.floor(Math.random() * 10);  // generates a random number of spheres between 0 and 10
+  const colours = [];
+  for (let i = 0; i < numOfSpheres; i++) {
+    colours.push(getRandomRGBColour()); // generates a random color and adds it to the colours array
+  }
 
   createSpheres(body, numOfSpheres, colours);  // call the function to create spheres
-});
+}
+
+document.addEventListener("DOMContentLoaded", initialise);
+
 
 
 //es6        
+
+//use css definitions for shadow creation
+//sun is its own separate object, no collisions

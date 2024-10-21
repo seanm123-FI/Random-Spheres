@@ -6,3 +6,14 @@
   border-radius: 50%;  /* gives spherical shape, square with no border radius */
 }
 
+.sun{
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, yellow, orange);
+  position: absolute;
+  box-shadow: 0 0 10px 3px yellow;
+  top: 100px; /* Fixed Y position for simplicity */
+  transition: left 0.5s ease-in-out; /* Smoothly move sun horizontally */
+}
+
