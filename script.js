@@ -3,7 +3,7 @@ let allSpheres = [];
 
 // Define Ireland's latitude and longitude
 const IRELAND_COORDS = {
-  lat: 53.1424,
+  lat: 53.1424, 
   lng: -7.6921
 };
 

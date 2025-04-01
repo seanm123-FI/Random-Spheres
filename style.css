@@ -1,3 +1,5 @@
+/* modules/Random-Spheres/style.css */
+
 .sphere{
   display: block;            /* gives separate line in doc flow */
   position: absolute;      /* positoned absolutely by the declaration for left and bottom in js */
